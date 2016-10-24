@@ -11,37 +11,42 @@ namespace BrianTools.SimpleGrid
         private GameObject _gridElementPrefab;
 
         [SerializeField]
-        private List<List<SimpleGridElement>> _gridElements;
+        private Dictionary<IntVector2, SimpleGridElement> _gridElements;
 
         [SerializeField]
         private Vector3 _gridElementPadding;
+        [SerializeField]
+        private Vector3 _gridElementSize;
 
         [SerializeField]
         private Vector3 _startingSize;
 
         public SimpleGridElement GetGridElement(IntVector2 elementIndex)
         {
-            return _gridElements[elementIndex.x][elementIndex.y];
+            return _gridElements[elementIndex];
         }
 
         [ContextMenu("InitializeGrid()")]
         public void InitializeGrid()
         {
-            _gridElements = new List<List<SimpleGridElement>>(Mathf.RoundToInt(_startingSize.x));
+            _gridElements = new Dictionary<IntVector2, SimpleGridElement>();//new List<List<SimpleGridElement>>(Mathf.RoundToInt(_startingSize.x));
 
-            for (int x = 0; x < _startingSize.x; x++)
+            for (int x = -(int)_startingSize.x / 2; x < _startingSize.x / 2; x++)
             {
-                _gridElements.Insert(x, new List<SimpleGridElement>(Mathf.RoundToInt(_startingSize.z)));
-                for (int z = 0; z < _startingSize.z; z++)
+                //_gridElements.Add(x, new List<SimpleGridElement>(Mathf.RoundToInt(_startingSize.z)));
+                for (int z = -(int)_startingSize.z / 2; z < _startingSize.z / 2; z++)
                 {
                     GameObject instance = CreateGridElement();
                     instance.transform.parent = this.transform;
-                    instance.transform.localPosition = new Vector3(x, 0, z);
+                    instance.transform.localPosition = new Vector3(x * _gridElementSize.x, 0 * _gridElementSize.y, z * _gridElementSize.z);
                     instance.name = "Cell (" + x + ",0," + z + ")";
 
                     SimpleGridElement gridComp = instance.GetComponent<SimpleGridElement>();
-                    _gridElements[x].Insert(z, gridComp);
+                    //_gridElements[x].Insert(z, gridComp);
                     gridComp.Grid = this;
+
+                    IntVector2 indexer = new IntVector2(x, z);
+                    _gridElements.Add(indexer, gridComp);
 
                 }
             }
