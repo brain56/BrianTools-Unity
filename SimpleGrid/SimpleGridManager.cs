@@ -57,5 +57,22 @@ namespace BrianTools.SimpleGrid
             GameObject instance = GameObject.Instantiate(_gridElementPrefab) as GameObject;
             return instance;
         }
+
+        public SimpleGridElement GetGridElementAtInputPosition()
+        {
+            SimpleGridElement element = null;
+
+            RaycastHit hit;
+            Camera camera = Camera.main;
+            Ray ray = camera.ScreenPointToRay(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 1000));
+            Debug.DrawRay(ray.origin, ray.direction * 1000);
+
+            if (Physics.Raycast(ray, out hit))
+            {
+                //Debug.Log("Hit: " + hit.collider.gameObject.name);
+                element = hit.collider.gameObject.GetComponent<SimpleGridElement>();
+            }
+            return element;
+        }
     }
 }

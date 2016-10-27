@@ -27,5 +27,12 @@ namespace BrianTools
                 action();
             }
         }
+
+        public static void Normalize(this Transform trans)
+        {
+            trans.localPosition = Vector3.zero;
+            trans.localEulerAngles = Vector3.zero;
+            trans.localScale = Vector3.one;
+        }
     }
 }
