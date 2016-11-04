@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using System;
 
 namespace BrianTools
@@ -34,5 +34,13 @@ namespace BrianTools
             trans.localEulerAngles = Vector3.zero;
             trans.localScale = Vector3.one;
         }
+
+		public static void AddUnique<T>(this List<T> list, T item)
+		{
+			if(!list.Contains(item))
+			{
+				list.Add(item);
+			}
+		}
     }
 }
