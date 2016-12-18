@@ -19,23 +19,23 @@ namespace BrianTools
 		/// <summary>
 		/// Clones line up in a queue and take turns for spawning
 		/// </summary>
-		Queue objectQueue;
+		private Queue _objectQueue;
 
 		/// <summary>
 		/// A list of all objects which belong to this pool. Used for bookkeeping.
 		/// </summary>
-		List<GameObject> objectsInPool;
+		private List<GameObject> _objectsInPool;
 
 		/// <summary>
 		/// The prefab or the original game object upon which the clones in the pool are based.
 		/// </summary>
-		GameObject originalPrefab;
+		private GameObject _originalPrefab;
 
 		/// <summary>
 		/// The parent game object of the pool for 
 		/// organization in the Unity Editor hierarchy.
 		/// </summary>
-		GameObject poolParent;
+		private GameObject _poolParent;
 
 		/// <summary>
 		/// If set to true, the pool will create new 
@@ -43,17 +43,17 @@ namespace BrianTools
 		/// clones in the pool. If false, the pool will just 
 		/// return null if it has no clone to spare.
 		/// </summary>
-		bool doesExpand;
+		private bool _doesExpand;
 
 		public ObjectPool(GameObject pOriginalPrefab, uint startSize = 10, bool pDoesExpand = true)
 		{
-			this.doesExpand = pDoesExpand;
-			this.objectQueue = new Queue();
-			this.objectsInPool = new List<GameObject>();
-			this.originalPrefab = pOriginalPrefab;
+			this._doesExpand = pDoesExpand;
+			this._objectQueue = new Queue();
+			this._objectsInPool = new List<GameObject>();
+			this._originalPrefab = pOriginalPrefab;
 
-			this.poolParent = new GameObject();
-			this.poolParent.name = this.originalPrefab.name + " Pool";
+			this._poolParent = new GameObject();
+			this._poolParent.name = this._originalPrefab.name + " Pool";
 
 			for (int i = 0; i < startSize; i++)
 			{
@@ -67,49 +67,54 @@ namespace BrianTools
 		/// </summary>
 		private void CreateClone()
 		{
-			GameObject clone = GameObject.Instantiate(this.originalPrefab);
-			clone.name = this.originalPrefab.name;
-			objectsInPool.Add(clone);
+			GameObject clone = GameObject.Instantiate(this._originalPrefab);
+			clone.name = this._originalPrefab.name;
+			_objectsInPool.Add(clone);
 			ReturnToPool(clone);
-			clone.transform.parent = this.poolParent.transform;
+			clone.transform.parent = this._poolParent.transform;
 
 		}
 
 		/// <summary>
-		/// Gets one clone from the pool for usage.
+		/// Gets one clone from the pool for usage. When a new gameobject reference
+		/// is received, the game object is deactivated and management/re-initialization 
+		/// of it is delegated to the receiver.
 		/// </summary>
 		/// <returns>A clone</returns>
 		public GameObject GetClone()
 		{
-			if (this.objectQueue.Count == 0)
+			if (this._objectQueue.Count == 0)
 			{
-				if (!this.doesExpand)
+				if (!this._doesExpand)
 				{
 					return null;
 				}
 
 				CreateClone();
-				Debug.Log("Pool empty. Creating more " + this.originalPrefab.name + "clones. New clone count: " + this.objectsInPool.Count);
+				Debug.Log("Pool empty. Creating more " + this._originalPrefab.name + "clones. New clone count: " + this._objectsInPool.Count);
 			}
 
-			GameObject clone = this.objectQueue.Dequeue() as GameObject;
+			GameObject clone = this._objectQueue.Dequeue() as GameObject;
 			return clone;
 		}
 
 		/// <summary>
 		/// Returns the gameObject to this pool,
 		/// but only if that gameObject belongs to this pool.
+		/// 
+		/// The game object is deactivated when it returns
+		/// to the object pool.
 		/// </summary>
 		/// <param name="pGameObject">The GameObject to return.</param>
 		public void ReturnToPool(GameObject pGameObject)
 		{
-			if (!this.objectsInPool.Contains(pGameObject))
+			if (!this._objectsInPool.Contains(pGameObject))
 			{
-				Debug.LogError("The gameObject " + pGameObject.name + " does not belong in this pool of " + this.originalPrefab.name + "s!");
+				Debug.LogError("The gameObject " + pGameObject.name + " does not belong in this pool of " + this._originalPrefab.name + "s!");
 			}
 
 			pGameObject.SetActive(false);
-			this.objectQueue.Enqueue(pGameObject);
+			this._objectQueue.Enqueue(pGameObject);
 		}
 	}
 }
