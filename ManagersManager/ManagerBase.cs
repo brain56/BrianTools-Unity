@@ -35,7 +35,8 @@ namespace BrianTools.ManagersManager
             else
             {
                 _sInstance = (T)Convert.ChangeType(this, typeof(T));
-            }
+				DontDestroyOnLoad(_sInstance.gameObject);
+			}
         }
 
         void OnDestroy()

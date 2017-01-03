@@ -19,6 +19,7 @@ namespace BrianTools.ManagersManager
 					GameObject prefab = Resources.Load("Prefabs/Managers/ManagersManager") as GameObject;
 					GameObject instance = GameObject.Instantiate(prefab);
 					sInstance = instance.GetComponent<ManagersManager>();
+					DontDestroyOnLoad(sInstance.gameObject);
 				}
 				return sInstance;
 			}
@@ -31,6 +32,11 @@ namespace BrianTools.ManagersManager
 		{
 			GameObject prefab = _managers.Find(x => x.GetComponent<T>() != null);
 			return prefab;
+		}
+
+		private void Awake()
+		{
+			DontDestroyOnLoad(this.gameObject);
 		}
 
 #if UNITY_EDITOR
