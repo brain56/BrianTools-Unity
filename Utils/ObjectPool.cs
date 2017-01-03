@@ -45,15 +45,30 @@ namespace BrianTools
 		/// </summary>
 		private bool _doesExpand;
 
-		public ObjectPool(GameObject pOriginalPrefab, uint startSize = 10, bool pDoesExpand = true)
-		{
-			this._doesExpand = pDoesExpand;
-			this._objectQueue = new Queue();
-			this._objectsInPool = new List<GameObject>();
-			this._originalPrefab = pOriginalPrefab;
+		/// <summary>
+		/// If set to true, pool instances will persist
+		/// across scenes assuming that they're returned
+		/// to the pool correctly before transitioning to another
+		/// scene.
+		/// </summary>
+		private bool _dontDestroyClonesOnLoad;
 
-			this._poolParent = new GameObject();
-			this._poolParent.name = this._originalPrefab.name + " Pool";
+		public ObjectPool(GameObject pOriginalPrefab, uint startSize = 10, bool pDoesExpand = true, bool dontDestroyClonesOnLoad = false)
+		{
+			_dontDestroyClonesOnLoad = dontDestroyClonesOnLoad;
+			_doesExpand = pDoesExpand;
+			_objectQueue = new Queue();
+			_objectsInPool = new List<GameObject>();
+			_originalPrefab = pOriginalPrefab;
+
+			_poolParent = new GameObject();
+
+			if(_dontDestroyClonesOnLoad)
+			{
+				GameObject.DontDestroyOnLoad(_poolParent);
+			}
+
+			_poolParent.name = this._originalPrefab.name + " Pool";
 
 			for (int i = 0; i < startSize; i++)
 			{
@@ -68,6 +83,12 @@ namespace BrianTools
 		private void CreateClone()
 		{
 			GameObject clone = GameObject.Instantiate(this._originalPrefab);
+
+			if (_dontDestroyClonesOnLoad)
+			{
+				GameObject.DontDestroyOnLoad(clone);
+			}
+
 			clone.name = this._originalPrefab.name;
 			_objectsInPool.Add(clone);
 			ReturnToPool(clone);
