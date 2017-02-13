@@ -31,11 +31,13 @@ namespace BrianTools
 		/// </summary>
 		private GameObject _originalPrefab;
 
+#if UNITY_EDITOR
 		/// <summary>
 		/// The parent game object of the pool for 
 		/// organization in the Unity Editor hierarchy.
 		/// </summary>
 		private GameObject _poolParent;
+#endif
 
 		/// <summary>
 		/// If set to true, the pool will create new 
@@ -61,14 +63,16 @@ namespace BrianTools
 			_objectsInPool = new List<GameObject>();
 			_originalPrefab = pOriginalPrefab;
 
+#if UNITY_EDITOR
 			_poolParent = new GameObject();
 
-			if(_dontDestroyClonesOnLoad)
+			if (_dontDestroyClonesOnLoad)
 			{
 				GameObject.DontDestroyOnLoad(_poolParent);
 			}
 
 			_poolParent.name = this._originalPrefab.name + " Pool";
+#endif
 
 			for (int i = 0; i < startSize; i++)
 			{
@@ -82,17 +86,20 @@ namespace BrianTools
 		/// </summary>
 		private void CreateClone()
 		{
-			GameObject clone = GameObject.Instantiate(this._originalPrefab);
+			GameObject clone = GameObject.Instantiate(_originalPrefab);
 
 			if (_dontDestroyClonesOnLoad)
 			{
 				GameObject.DontDestroyOnLoad(clone);
 			}
 
-			clone.name = this._originalPrefab.name;
+			clone.name = _originalPrefab.name;
 			_objectsInPool.Add(clone);
 			ReturnToPool(clone);
-			clone.transform.parent = this._poolParent.transform;
+
+#if UNITY_EDITOR
+			clone.transform.parent = _poolParent.transform;
+#endif
 
 		}
 
@@ -135,7 +142,7 @@ namespace BrianTools
 			}
 
 			pGameObject.SetActive(false);
-			this._objectQueue.Enqueue(pGameObject);
+			_objectQueue.Enqueue(pGameObject);
 		}
 	}
 }
