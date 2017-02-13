@@ -28,6 +28,9 @@ namespace BrianTools.ManagersManager
 		[SerializeField]
 		private List<GameObject> _managers;
 
+		[SerializeField]
+		private GameObject _primevalManager;
+
 		public GameObject GetManagerPrefab<T>() where T : Component
 		{
 			GameObject prefab = _managers.Find(x => x.GetComponent<T>() != null);
@@ -36,19 +39,33 @@ namespace BrianTools.ManagersManager
 
 		private void Awake()
 		{
-			DontDestroyOnLoad(this.gameObject);
+			if (sInstance != null)
+			{
+				Debug.LogWarning("Error! Duplicate ManagersManager exists! Destroying new instance;");
+				GameObject.Destroy(gameObject);
+			}
+			else
+			{
+				sInstance = this;
+				DontDestroyOnLoad(gameObject);
+
+				if(_primevalManager)
+				{
+					GameObject instance = GameObject.Instantiate(_primevalManager);
+					DontDestroyOnLoad(instance.gameObject);
+				}
+			}
 		}
 
 #if UNITY_EDITOR
 		[ContextMenu("AlphabetizeManagersList()")]
 		public void AlphabetizeManagersList()
 		{
-			_managers.Sort(delegate(GameObject a, GameObject b)
+			_managers.Sort(delegate (GameObject a, GameObject b)
 			{
 				return a.name.CompareTo(b.name);
 			});
 		}
 #endif
-
 	}
 }

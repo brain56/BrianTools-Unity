@@ -30,7 +30,7 @@ namespace BrianTools.ManagersManager
             if (_sInstance != null)
             {
                 Debug.LogError("Error! Duplicate manager of type " + typeof(T).ToString() + " exists! Destroying new instance;");
-                GameObject.Destroy(this);
+                GameObject.Destroy(gameObject);
             }
             else
             {

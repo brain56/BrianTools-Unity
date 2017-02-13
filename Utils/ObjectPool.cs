@@ -98,7 +98,7 @@ namespace BrianTools
 			ReturnToPool(clone);
 
 #if UNITY_EDITOR
-			clone.transform.parent = _poolParent.transform;
+			clone.transform.SetParent(_poolParent.transform);
 #endif
 
 		}
