@@ -4,6 +4,15 @@ using System;
 
 namespace BrianTools
 {
+	public sealed class Constants
+	{
+		private static Vector3 sVector3Zero = Vector3.zero;
+		public static Vector3 Vector3Zero
+		{
+			get { return sVector3Zero; }
+		}
+	}
+
 	public struct Tuple<T, U>
 	{
 
@@ -30,8 +39,8 @@ namespace BrianTools
 
 		public static void Normalize(this Transform trans)
 		{
-			trans.localPosition = Vector3.zero;
-			trans.localEulerAngles = Vector3.zero;
+			trans.localPosition = BrianTools.Constants.Vector3Zero;
+			trans.localEulerAngles = BrianTools.Constants.Vector3Zero;
 			trans.localScale = Vector3.one;
 		}
 
