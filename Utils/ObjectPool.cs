@@ -87,6 +87,7 @@ namespace BrianTools
 		private void CreateClone()
 		{
 			GameObject clone = GameObject.Instantiate(_originalPrefab);
+			clone.name = _originalPrefab.name;
 
 			if (_dontDestroyClonesOnLoad)
 			{
@@ -142,6 +143,15 @@ namespace BrianTools
 			}
 
 			pGameObject.SetActive(false);
+
+#if !UNITY_EDITOR
+			pGameObject.transform.SetParent(null);			
+#endif
+
+#if UNITY_EDITOR
+			pGameObject.transform.SetParent(_poolParent.transform);
+#endif
+
 			_objectQueue.Enqueue(pGameObject);
 		}
 	}
