@@ -2,6 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Data class used to store and compare world states
+/// and other information that the agent needs to evaluate
+/// its goals and actions.
+/// 
+/// At it's core, it's essentially a dictionary of boolean values,
+/// which are evaluated as the conditions to decide what actions
+/// and goals can be evaluated/processed.
+/// </summary>
 [System.Serializable]
 public class BrianGoapData 
 {

@@ -15,10 +15,12 @@ public class BrianGoapGoal : MonoBehaviour
 	}
 
 	[SerializeField]
-	private int _priorityRating;
+	[Tooltip("The priority rating of this goal. A smaller number means it has higher priority, and so will be resolved first versus another goal with a lower priority.")]
+	private int _priorityRating = 1;
 
 	/// <summary>
-	/// Smaller == higher!
+	/// The priority rating of this goal. A smaller number means it has higher
+	/// priority, and so will be resolved first versus another goal with a lower priority.
 	/// </summary>
 	public int PriorityRating
 	{
