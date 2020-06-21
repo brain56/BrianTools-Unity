@@ -14,6 +14,9 @@ namespace BrianTools
         }
     }
 
+    /// <summary>
+    /// A serializable int tuple class.
+    /// </summary>
     [Serializable]
     public struct IntVector2
     {
