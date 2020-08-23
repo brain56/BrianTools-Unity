@@ -6,6 +6,8 @@ namespace BrianTools
 {
     public class MathUtils
     {
+        public static readonly Vector3 k_180 = new Vector3(0, 180.0f, 0);
+
         public static float GetDistanceSquared(Vector3 position1, Vector3 position2)
         {
             return (position2.x - position1.x) * (position2.x - position1.x) +
