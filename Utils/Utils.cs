@@ -13,20 +13,6 @@ namespace BrianTools
 		}
 	}
 
-	public struct Tuple<T, U>
-	{
-
-		public T x;
-		public U y;
-
-		public Tuple(T x, U y)
-		{
-			this.x = x;
-			this.y = y;
-		}
-
-	}
-
 	public static class UtilExtensions
 	{
 		public static void SafeInvoke(this Action action)
@@ -71,7 +57,12 @@ namespace BrianTools
 			}
 		}
 
-        public static void ShuffleList<T>(this IList<T> list)
+		/// <summary>
+		/// An implementation of the Fisher-Yates Shuffle (https://stackoverflow.com/a/1262619)
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="list"></param>
+		public static void ShuffleList<T>(this IList<T> list)
         {
             int n = list.Count;
             while (n > 1)
