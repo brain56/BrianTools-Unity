@@ -74,5 +74,10 @@ namespace BrianTools
                 list[n] = value;
             }
         }
-    }
+
+		public static bool IsValidIndex<T>(this IList<T> list, int index)
+		{
+			return index < list.Count && index >= 0;
+		}
+	}
 }
