@@ -46,10 +46,10 @@ namespace BrianTools
 				t.gameObject.SetLayerRecursively(layer);
 			}
 		}
-		
+
 		public static void DestroyChildren(this Transform transform)
 		{
-			while(transform.childCount > 0)
+			while (transform.childCount > 0)
 			{
 				Transform child = transform.GetChild(0);
 				child.SetParent(null);
@@ -63,17 +63,17 @@ namespace BrianTools
 		/// <typeparam name="T"></typeparam>
 		/// <param name="list"></param>
 		public static void ShuffleList<T>(this IList<T> list)
-        {
-            int n = list.Count;
-            while (n > 1)
-            {
-                n--;
-                int k = UnityEngine.Random.Range(0, n + 1);
-                T value = list[k];
-                list[k] = list[n];
-                list[n] = value;
-            }
-        }
+		{
+			int n = list.Count;
+			while (n > 1)
+			{
+				n--;
+				int k = UnityEngine.Random.Range(0, n + 1);
+				T value = list[k];
+				list[k] = list[n];
+				list[n] = value;
+			}
+		}
 
 		public static bool IsValidIndex<T>(this IList<T> list, int index)
 		{
