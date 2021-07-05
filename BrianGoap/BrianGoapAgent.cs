@@ -20,8 +20,8 @@ public class BrianGoapAgent : MonoBehaviour
 
 	private bool _isActing;
 
-	[SerializeField]
-	private bool _currentGoalUnattainable;
+	//[SerializeField]
+	//private bool _currentGoalUnattainable;
 
 	// Use this for initialization
 	void Start()
@@ -103,11 +103,11 @@ public class BrianGoapAgent : MonoBehaviour
 		if (actionCandidates.Count == 0)
 		{
 			// Nothing we can do to meet goal!
-			_currentGoalUnattainable = true;
+			//_currentGoalUnattainable = true;
 			yield break;
 		}
 
-		_currentGoalUnattainable = false;
+		//_currentGoalUnattainable = false;
 
 		actionCandidates.Sort(delegate (BrianGoapAction x, BrianGoapAction y)
 		{
