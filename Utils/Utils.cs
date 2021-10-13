@@ -79,5 +79,33 @@ namespace BrianTools
 		{
 			return index < list.Count && index >= 0;
 		}
+
+		/// <summary>
+		/// From https://answers.unity.com/questions/799616/unity-46-beta-19-how-to-convert-from-world-space-t.html
+		/// </summary>
+		/// <param name="uiElement"></param>
+		/// <param name="worldPosition"></param>
+		/// <param name="camera"></param>
+		public static void SetToWorldPosition(this RectTransform uiElement, Vector3 worldPosition, Camera camera, Canvas canvas)
+		{
+			//first you need the RectTransform component of your canvas
+			RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+
+			//then you calculate the position of the UI element
+			//0,0 for the canvas is at the center of the screen, whereas WorldToViewPortPoint treats the lower left corner as 0,0. Because of this, you need to subtract the height / width of the canvas * 0.5 to get the correct position.
+			Vector2 viewportPosition = camera.WorldToViewportPoint(worldPosition);
+			Vector2 WorldObject_ScreenPosition = new Vector2(
+			((viewportPosition.x * canvasRect.sizeDelta.x) - (canvasRect.sizeDelta.x * 0.5f)),
+			((viewportPosition.y * canvasRect.sizeDelta.y) - (canvasRect.sizeDelta.y * 0.5f)));
+
+			//now you can set the position of the ui element
+			uiElement.anchoredPosition = WorldObject_ScreenPosition;
+		}
+
+		public static bool IsNullOrEmpty(this string inString)
+		{
+			return inString == "" || inString == null;
+		}
+
 	}
 }
