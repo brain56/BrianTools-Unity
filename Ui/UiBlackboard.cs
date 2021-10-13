@@ -34,7 +34,7 @@ namespace BrianTools.Ui
 		List<UiBlackBoardNode<float>> _floatBlackboard;
 
 		List<UiBlackBoardNode<string>> _stringBlackboard;
-		
+
 		public delegate void ValueUpdatedDelegate<T>(T value);
 
 		public class UiBlackBoardNode<T>
@@ -85,117 +85,116 @@ namespace BrianTools.Ui
 			}
 		}
 
+		UiBlackBoardNode<T> FindNode<T>(UiBlackBoardNode<T> startingNode, List<string> nodePath, bool shouldAddMissingNode = false)
+		{
+			if (nodePath.Count == 0)
+			{
+				return null;
+			}
+
+			if (nodePath.Count == 1)
+			{
+				string lastKey = nodePath[0];
+				if (startingNode.Key == lastKey)
+				{
+					return startingNode;
+				}
+
+				var lastChildNode = startingNode.Children.Find(x => x.Key == lastKey);
+				if (lastChildNode == null)
+				{
+					if (shouldAddMissingNode)
+					{
+						var newChild = new UiBlackBoardNode<T>(lastKey, default(T), startingNode);
+						startingNode.Children.Add(newChild);
+						return newChild;
+					}
+				}
+				else
+				{
+					return lastChildNode;
+				}
+			}
+
+			string nextChildNodeKey = nodePath[0];
+			nodePath.RemoveAt(0);
+
+			UiBlackBoardNode<T> nextChildNode = null;
+
+			// Find the next node in the starting node or its children
+			if (startingNode.Key == nextChildNodeKey)
+			{
+				nextChildNode = startingNode;
+			}
+			else
+			{
+				nextChildNode = startingNode.Children.Find(x => x.Key == nextChildNodeKey);
+			}
+
+			if (nextChildNode == null)
+			{
+				// Next node could not be found
+				if (shouldAddMissingNode)
+				{
+					// Start the creation of a new branch
+					var newChild = new UiBlackBoardNode<T>(nextChildNodeKey, default(T), startingNode);
+					startingNode.Children.Add(newChild);
+					return FindNode<T>(newChild, nodePath, shouldAddMissingNode);
+				}
+				else
+				{
+					// Nothing more we can do!
+					return null;
+				}
+			}
+			else
+			{
+				// Continue traversal down the child nodes
+				return FindNode<T>(nextChildNode, nodePath, shouldAddMissingNode);
+			}
+		}
+
 		public void AddIntDelegate(string nodePath, ValueUpdatedDelegate<int> newDelegate)
 		{
 			List<string> tokenizedNodePath = new List<string>(TokenizeNodePath(nodePath));
 			var firstNode = _intBlackboard.Find(x => x.Key == tokenizedNodePath[0]);
 
-			if(firstNode == null)
-			{
-				firstNode = new UiBlackBoardNode<int>(tokenizedNodePath[0], default(int), null);
-			}
-
-			tokenizedNodePath.RemoveAt(0);
-
-			AddDelegate<int>(firstNode, new List<string>(tokenizedNodePath), newDelegate);
-		}
-	
-		public void AddDelegate<T>(UiBlackBoardNode<T> startingNode, List<string> nodePath, ValueUpdatedDelegate<T> newDelegate)
-		{
-			if (startingNode == null || nodePath.Count == 0)
-			{
-				Debug.LogError("Invalid node!");
-				return;
-			}
-
-			string currentNodePathKey = nodePath[0];
-
-			if (currentNodePathKey == startingNode.Key)
-			{
-				startingNode.ValueChangeDelegates.Add(newDelegate);
-				return;
-			}
-
-			var nextKey = nodePath[0];
-			var nextNode = startingNode.Children.Find(x => x.Key == nextKey);
-
-			if (nextNode == null)
-			{
-				// Add new node here
-				var newChild = new UiBlackBoardNode<T>(nextKey, default(T), startingNode);
-				newChild.ValueChangeDelegates.Add(newDelegate);
-				startingNode.Children.Add(newChild);
-				return;
-			}
-			else if(nextNode.Key == nextKey)
-			{
-				nextNode.ValueChangeDelegates.Add(newDelegate);
-				return;
-			}
-
-			nodePath.RemoveAt(0);
-			AddDelegate<T>(nextNode, nodePath, newDelegate);
-		}
-
-		public void RemoveIntDelegate(string nodePath, object delegateTargetObject)
-		{
-			string[] tokenizedNodePath = TokenizeNodePath(nodePath);
-			var firstNode = _intBlackboard.Find(x => x.Key == tokenizedNodePath[0]);
-			RemoveDelegate<int>(firstNode, new List<string>(tokenizedNodePath), delegateTargetObject);
-		}
-
-		void RemoveDelegate<T>(UiBlackBoardNode<T> startingNode, List<string> nodePath, object delegateTargetObject)
-		{
-			if(startingNode == null || nodePath.Count == 0)
-			{
-				Debug.LogError("Invalid node!");
-				return;
-			}
-
-			string currentNodePathKey = nodePath[0];
-
-			if (currentNodePathKey == startingNode.Key)
-			{
-				startingNode.ValueChangeDelegates.RemoveAll( x=> x.Target == delegateTargetObject);
-				return;
-			}
-
-			nodePath.RemoveAt(0);
-
-			var nextKey = nodePath[0];
-			var nextNode = startingNode.Children.Find(x => x.Key == nextKey);
-
-			if (nextNode == null)
-			{
-				Debug.LogError("Invalid node path " + nodePath);
-				return;
-			}
-			else
-			{
-				RemoveDelegate<T>(nextNode, nodePath, delegateTargetObject);
-			}
-
-		}
-
-		public void SetIntValue(string nodePath, int value)
-		{
-			string[] tokenizedNodePath = TokenizeNodePath(nodePath);
-			var firstNode = _intBlackboard.Find(x => x.Key == tokenizedNodePath[0]);
-			
-			if(firstNode == null)
+			if (firstNode == null)
 			{
 				firstNode = new UiBlackBoardNode<int>(tokenizedNodePath[0], default(int), null);
 				_intBlackboard.Add(firstNode);
 			}
-			
-			if(tokenizedNodePath.Length == 1)
+
+			var foundNode = FindNode<int>(firstNode, tokenizedNodePath, true);
+			foundNode.ValueChangeDelegates.Add(newDelegate);
+		}
+
+		public void RemoveIntDelegate(string nodePath, object delegateTargetObject)
+		{
+			List<string> tokenizedNodePath = new List<string>(TokenizeNodePath(nodePath));
+			var firstNode = _intBlackboard.Find(x => x.Key == tokenizedNodePath[0]);
+
+			if (firstNode != null)
 			{
-				firstNode.Value = value;
-				return;
+				var foundNode = FindNode<int>(firstNode, tokenizedNodePath, false);
+				foundNode.ValueChangeDelegates.RemoveAll(x => x.Target == delegateTargetObject);
+			}
+		}
+
+		public void SetIntValue(string nodePath, int value)
+		{
+			List<string> tokenizedNodePath = new List<string>(TokenizeNodePath(nodePath));
+			var firstNode = _intBlackboard.Find(x => x.Key == tokenizedNodePath[0]);
+
+			if (firstNode == null)
+			{
+				firstNode = new UiBlackBoardNode<int>(tokenizedNodePath[0], default(int), null);
+				_intBlackboard.Add(firstNode);
 			}
 
-			SetValue<int>(firstNode, new List<string>(tokenizedNodePath), value);
-			
+			var foundNode = FindNode<int>(firstNode, tokenizedNodePath, true);
+			foundNode.Value = value;
+			InvokeValueChangeDelegates<int>(foundNode);
 		}
 
 		public int GetIntValue(string nodePath)
@@ -205,17 +204,16 @@ namespace BrianTools.Ui
 
 			if (firstNode == null)
 			{
-				firstNode = new UiBlackBoardNode<int>(tokenizedNodePath[0], 0, null);
+				firstNode = new UiBlackBoardNode<int>(tokenizedNodePath[0], default(int), null);
+				_intBlackboard.Add(firstNode);
 			}
 
-			if(tokenizedNodePath.Count == 1)
+			var foundNode = FindNode<int>(firstNode, tokenizedNodePath, false);
+			if (foundNode != null)
 			{
-				return firstNode.Value;
+				return foundNode.Value;
 			}
-
-			tokenizedNodePath.RemoveAt(0);
-
-			return GetValue<int>(firstNode, new List<string>(tokenizedNodePath));
+			return 0;
 		}
 
 		string[] TokenizeNodePath(string nodePath)
@@ -231,72 +229,18 @@ namespace BrianTools.Ui
 
 		void InvokeValueChangeDelegates<T>(UiBlackBoardNode<T> node)
 		{
-			if(node == null)
+			if (node == null)
 			{
 				Debug.LogError("Null node!");
 				return;
 			}
 
-			for(int i = 0; i < node.ValueChangeDelegates.Count; ++i)
+			for (int i = 0; i < node.ValueChangeDelegates.Count; ++i)
 			{
 				var valueChangeDelegate = node.ValueChangeDelegates[i];
 				// TODO: Do we provide the paths as well???
 				valueChangeDelegate.Invoke(node.Value);
 			}
 		}
-
-		void SetValue<T>(UiBlackBoardNode<T> startingNode, List<string> nodePath, T value)
-		{
-			string currentNodePathKey = nodePath[0];
-
-			if (currentNodePathKey == startingNode.Key && nodePath.Count == 1)
-			{
-				// If we're at the last node
-				startingNode.Value = value;
-				InvokeValueChangeDelegates<T>(startingNode);
-				return;
-			}
-
-			nodePath.RemoveAt(0);
-
-			var nextKey = nodePath[0];
-			var nextNode = startingNode.Children.Find(x => x.Key == nextKey);
-
-			if (nextNode == null)
-			{
-				var newChild = new UiBlackBoardNode<T>(nextKey, value, startingNode);
-				startingNode.Children.Add(newChild);
-				return;
-			}
-			else
-			{
-				SetValue<T>(nextNode, nodePath, value);
-			}
-		}
-
-		T GetValue<T>(UiBlackBoardNode<T> startingNode, List<string> nodePath)
-		{
-			T value = default(T);
-
-			string currentNodePathKey = nodePath[0];
-
-			var nextKey = nodePath[0];
-			var nextNode = startingNode.Children.Find(x => x.Key == nextKey);
-
-			if (nextNode == null)
-			{
-				Debug.LogError("Invalid entry path \"" + nodePath + "\" received!");
-				return default(T);
-			}
-			else if (currentNodePathKey == nextNode.Key)
-			{
-				return nextNode.Value;
-			}
-
-			nodePath.RemoveAt(0);
-
-			return GetValue<T>(nextNode, nodePath);
-		}
-
 	}
 }
